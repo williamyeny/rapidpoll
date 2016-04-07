@@ -37,8 +37,16 @@ html
               div.answer-div
                 p test 1234 lelogram
       
-      #input-div
-        input#input(type='text')
+      #new-answer-div
+        input#answer-input(type='text', placeholder='answer a question')
+        .submit-div
+          a#submit-question(href='#')
+            i.material-icons send
         
+      #new-question-div
+        input#question-input(type='text', placeholder='ask a question')
+        .submit-div
+          a#submit-answer(href='#')
+            i.material-icons send
         
       

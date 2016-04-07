@@ -39,6 +39,7 @@
   border-radius: 5px;
   height:500px;
   vertical-align: top;
+  margin-bottom:10px;
 }
 
 .vote-div {
@@ -50,6 +51,10 @@
 }
 
 .upvote {
+  color:#dbdbdb;
+}
+
+#submit-question, #submit-answer {
   color:#545454;
 }
 
@@ -80,19 +85,34 @@ h2 {
   font-weight: 400;
 }
 
-#input-div {
-  margin-top: 15px;
+#new-answer-div, #new-question-div {
+  margin-bottom: 10px;
   width:796px;
   border: solid 2px #dddddd;
   border-radius: 5px;
+/*
+  display: flex;
+  align-items: center;
+*/
 }
 
 input {
-  width:700px;
+  width:745px;
   border:none;
   outline: none;
-  padding:5px;
+  padding:8px 0px 8px 12px;
   color:#333333;
+  display:inline-block;
+}
+
+.submit-div {
+  float:right;
+  display:inline-block;
+  color:#545454;
+  width:35px;
+  text-align: center;
+  right:0;
+  margin-top:5px;
 }
 
 i {
