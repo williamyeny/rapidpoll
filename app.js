@@ -10,6 +10,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var clients = {};
 var questions = {};
+var answers = {};
 
 
 app.get('/', function(req, res){
@@ -35,11 +36,29 @@ socket.on('connection', function(client) {
     console.log('question received: ' + data);
     questions[client.id] = {question: data, id: client.id};
     console.log(questions);
+    socket.emit('new question entered', Object.keys(questions).length);
   });
   
   client.on('submit answer', function(data) {
     console.log('answer received: ' + data);
+    answers[client.id] = {answer: data, id: client.id, score: 0};
+    socket.emit('new answer', answers[client.id]);
   });
+  
+  client.on('get queue', function() {
+    var place = 0;
+    for(var key in questions) {
+      place++;
+      if (key == client.id) {
+        client.emit('get queue', place);
+        break;
+      }
+    }
+  });
+  
+  client.on('upvote', function() {
+    
+  })
 });
 
 http.listen(3000, function(){
@@ -49,14 +68,15 @@ http.listen(3000, function(){
 newQuestion();
 
 function newQuestion() {
+  answers = {};
   if (Object.keys(questions).length != 0) {
-    socket.emit('new question', questions[Object.keys(questions)[0]]);
+    socket.emit('new question sent', questions[Object.keys(questions)[0]]);
     console.log('id of question to be deleted: ' + Object.keys(questions)[0]);
     delete questions[Object.keys(questions)[0]];
 //    console.log('deleted ' + questions);
     setTimeout(function() {
       newQuestion();
-    }, 5000); //question duration
+    }, 15000); //question duration
   } else {
     console.log('No questions in queue...');
     setTimeout(function(){
