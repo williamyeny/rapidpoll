@@ -22,24 +22,22 @@
   color:#333333;
 }
 
-#top-div{
+.answers {
   display: inline-block;
   width:390px;
-  
-  margin-right: 12px;
   border: solid 2px #dddddd;
   border-radius: 5px;
   height:500px;
+  margin-bottom:10px;
+  overflow:auto;
+}
+
+#top-div {
+  margin-right: 12px;
 } 
 
 #new-div {
-  display: inline-block;
-  width:390px;
-  border: solid 2px #dddddd;
-  border-radius: 5px;
-  height:500px;
-  vertical-align: top;
-  margin-bottom:10px;
+
 }
 
 .vote-div {
@@ -54,7 +52,7 @@
   color:#dbdbdb;
 }
 
-#submit-question, #submit-answer {
+#question-submit, #answer-submit {
   color:#545454;
 }
 
@@ -117,4 +115,8 @@ input {
 
 i {
   vertical-align: middle; 
+}
+
+a {
+  cursor: pointer;
 }

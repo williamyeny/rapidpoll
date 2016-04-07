@@ -12,41 +12,43 @@ html
       #question-div
         h2#question this is a question
         
-      #top-div
+      #top-div.answers
         ul
           li
             div.answer-sec
               div.vote-div
-                a.upvote(href='#')
+                a.upvote
                   i.material-icons arrow_upward
               div.answer-div
                 p test 1234 lelogram
-      #new-div
+      #new-div.answers
         ul
           li
             div.answer-sec
               div.vote-div
-                a.upvote(href='#')
+                a.upvote
                   i.material-icons arrow_upward
               div.answer-div
                 p test 1234 lelogram
-            div.answer-sec
-              div.vote-div
-                a.upvote(href='#')
-                  i.material-icons arrow_upward
-              div.answer-div
-                p test 1234 lelogram
+          each val in [1, 2, 3, 4, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+            li
+              div.answer-sec
+                div.vote-div
+                  a.upvote
+                    i.material-icons arrow_upward
+                div.answer-div
+                  p test 1234 lelogram
       
       #new-answer-div
         input#answer-input(type='text', placeholder='answer a question')
         .submit-div
-          a#submit-question(href='#')
+          a#answer-submit
             i.material-icons send
         
       #new-question-div
         input#question-input(type='text', placeholder='ask a question')
         .submit-div
-          a#submit-answer(href='#')
+          a#question-submit
             i.material-icons send
         
       

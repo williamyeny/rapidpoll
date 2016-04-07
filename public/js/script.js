@@ -9,7 +9,14 @@ $(document).ready(function() {
   
   
   socket.on('new question', function(data) {
-    console.log(data);
+    $('#question').html(data.question);
+    console.log('got new question: ' + data.question);
   });
   
+  $('#question-submit').click(function() {
+    socket.emit('submit question', $('#question-input').val());
+  });
+  $('#answer-submit').click(function() {
+    socket.emit('submit answer', $('#answer-input').val());
+  });
 });

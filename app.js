@@ -8,7 +8,9 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + "/views");
 app.use(express.static(path.join(__dirname, 'public')));
 
-var clients = [];
+var clients = {};
+var questions = {};
+
 
 app.get('/', function(req, res){
   res.render('index');
@@ -18,18 +20,25 @@ socket.on('connection', function(client) {
   
   client.on('join', function() {
     console.log('User with id ' + client.id + " connected")
-    clients.push(client.id);
+    clients[client.id] = " ";
     client.emit('join', client.id);
+    console.log(clients);
   });
   
   client.on('disconnect', function() {
-    for (i = 0; i < clients.length; i++) {
-      if (client.id == clients[i]) {
-        console.log('User ' + client.id + " disconnected")
-        clients.splice(i, 1);
-        break;
-      }
-    }
+    console.log('User ' + client.id + " disconnected")
+    delete questions[client.id];
+    delete clients[client.id];
+  });
+  
+  client.on('submit question', function(data) {
+    console.log('question received: ' + data);
+    questions[client.id] = {question: data, id: client.id};
+    console.log(questions);
+  });
+  
+  client.on('submit answer', function(data) {
+    console.log('answer received: ' + data);
   });
 });
 
@@ -40,15 +49,19 @@ http.listen(3000, function(){
 newQuestion();
 
 function newQuestion() {
-  if (clients.length != 0) {
-    randomNumber = parseInt(Math.random() * clients.length);
-    console.log('Player chosen: ' + clients[randomNumber]);
-    socket.emit('new question', clients[randomNumber]);
-    test();
+  if (Object.keys(questions).length != 0) {
+    socket.emit('new question', questions[Object.keys(questions)[0]]);
+    console.log('id of question to be deleted: ' + Object.keys(questions)[0]);
+    delete questions[Object.keys(questions)[0]];
+//    console.log('deleted ' + questions);
+    setTimeout(function() {
+      newQuestion();
+    }, 5000); //question duration
   } else {
-    console.log('No players...');
+    console.log('No questions in queue...');
     setTimeout(function(){
-        newQuestion();
+      socket.emit('new question', {question: 'no questions in queue', id:'n/a'})
+      newQuestion();
     }, 2000);
   }
 }
