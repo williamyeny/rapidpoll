@@ -1,0 +1,44 @@
+doctype html
+html
+  head
+    link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
+    link(rel='stylesheet', href='/css/style.css')
+    script(src='/socket.io/socket.io.js')
+    script(src='https://code.jquery.com/jquery-2.2.2.min.js',integrity='sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=', crossorigin='anonymous')
+    script(src='/js/script.js')
+  body
+    #container
+      h1 rapidpoll
+      #question-div
+        h2#question this is a question
+        
+      #top-div
+        ul
+          li
+            div.answer-sec
+              div.vote-div
+                a.upvote(href='#')
+                  i.material-icons arrow_upward
+              div.answer-div
+                p test 1234 lelogram
+      #new-div
+        ul
+          li
+            div.answer-sec
+              div.vote-div
+                a.upvote(href='#')
+                  i.material-icons arrow_upward
+              div.answer-div
+                p test 1234 lelogram
+            div.answer-sec
+              div.vote-div
+                a.upvote(href='#')
+                  i.material-icons arrow_upward
+              div.answer-div
+                p test 1234 lelogram
+      
+      #input-div
+        input#input(type='text')
+        
+        
+      
