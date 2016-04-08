@@ -27,6 +27,7 @@ $(document).ready(function() {
     if (id == data.id) {
       $("#question-input").prop('disabled', false);
       $('#question-input').attr('placeholder', 'ask a question');
+      $('#question-submit i').html('send');
     }
     
   });
@@ -34,7 +35,7 @@ $(document).ready(function() {
   socket.on('new question entered', function(data) {
     socket.emit('get queue');
     console.log('total questions: ' + data);
-  })
+  });
   
   socket.on('get queue', function(data) {
     $('#question-input').attr('placeholder', 'your question\'s position in queue: ' + data.place + '/' + data.total);
@@ -55,20 +56,29 @@ $(document).ready(function() {
   
   $("#question-input").keyup(function(event){
     if(event.keyCode == 13){
-        $("#question-submit").click();
+      $("#question-submit").click();
     }
   });
   
   $("#answer-input").keyup(function(event){
-      if(event.keyCode == 13){
-          $("#answer-submit").click();
-      }
+    if(event.keyCode == 13){
+      $("#answer-submit").click();
+    }
   });
   
   $('#question-submit').click(function() {
-    socket.emit('submit question', $('#question-input').val());
-    $('#question-input').val('');
-    $("#question-input").prop('disabled', true);
+    if ($('#question-submit i').html() == 'send') {
+      socket.emit('submit question', $('#question-input').val());
+      $('#question-input').val('');
+      $("#question-input").prop('disabled', true);
+      $('#question-submit i').html('clear');
+    } else {
+      console.log('clearing question');
+      socket.emit('clear question');
+      $("#question-input").prop('disabled', false);
+      $('#question-input').attr('placeholder', 'ask a question');
+      $('#question-submit i').html('send');
+    }
   });
   $('#answer-submit').click(function() {
     socket.emit('submit answer', $('#answer-input').val());

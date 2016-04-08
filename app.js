@@ -37,9 +37,19 @@ socket.on('connection', function(client) {
   
   client.on('submit question', function(data) {
     console.log('question received: ' + data);
-    questions[client.id] = {question: data, id: client.id};
-    console.log(questions);
-    socket.emit('new question entered', Object.keys(questions).length);
+    
+    if (client.id in questions) {
+      console.log('client already has question in queue');
+    } else {
+      questions[client.id] = {question: data, id: client.id};
+      console.log(questions);
+      socket.emit('new question entered', Object.keys(questions).length);
+    }
+  });
+  
+  client.on('clear question', function() {
+    delete questions[client.id];
+    console.log('cleared question, ' + questions);
   });
   
   client.on('submit answer', function(data) {
