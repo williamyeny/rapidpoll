@@ -52,6 +52,10 @@
   color:#dbdbdb;
 }
 
+.upvote-clicked {
+  color:#545454;
+}
+
 #question-submit, #answer-submit {
   color:#545454;
 }

@@ -11,6 +11,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 var clients = {};
 var questions = {};
 var answers = {};
+var questionDuration = 16;
+var secondsLeft = 0;
+var currentQuestion = {question: '', id: ''};
 
 
 app.get('/', function(req, res){
@@ -22,7 +25,7 @@ socket.on('connection', function(client) {
   client.on('join', function() {
     console.log('User with id ' + client.id + " connected")
     clients[client.id] = {upvoted: []};
-    client.emit('join', {id: client.id, answers: answers});
+    client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     console.log(clients);
   });
   
@@ -50,7 +53,7 @@ socket.on('connection', function(client) {
     for(var key in questions) {
       place++;
       if (key == client.id) {
-        client.emit('get queue', place);
+        client.emit('get queue', {place: place, total: Object.keys(questions).length});
         break;
       }
     }
@@ -77,29 +80,39 @@ http.listen(3000, function(){
   console.log('listening on *:3000');
 });
 
-//newQuestion();
+newQuestion();
 
 function newQuestion() {
   answers = {};
   if (Object.keys(questions).length != 0) {
     socket.emit('new question sent', questions[Object.keys(questions)[0]]);
+    currentQuestion = questions[Object.keys(questions)[0]];
     console.log('id of question to be deleted: ' + Object.keys(questions)[0]);
     delete questions[Object.keys(questions)[0]];
 //    console.log('deleted ' + questions);
-    setTimeout(function() {
-      newQuestion();
-    }, 15000); //question duration
+    secondsLeft = questionDuration;
+    socket.emit('timer', secondsLeft);
+    timer();
   } else {
     console.log('No questions in queue...');
+    currentQuestion = {question: '', id: ''};
+    socket.emit('new question sent', {question: 'no questions in queue', id:'n/a'})
     setTimeout(function(){
-      socket.emit('new question', {question: 'no questions in queue', id:'n/a'})
+      
       newQuestion();
     }, 2000);
   }
 }
 
-function test() {
+function timer() {
   setTimeout(function() {
-    newQuestion();
-  }, 10000);
+    secondsLeft -= 1;
+    console.log(secondsLeft);
+    if (secondsLeft >= 0) {
+      socket.emit('timer', secondsLeft);
+      timer();
+    } else {
+      newQuestion();
+    }
+  }, 1000)
 }

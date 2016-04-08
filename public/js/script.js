@@ -3,6 +3,7 @@ $(document).ready(function() {
   
   var id = "";
   socket.emit('join');
+  var mSecondsLeft = 0;
   
   socket.on('join', function(data) {
     id = data.id;
@@ -10,6 +11,7 @@ $(document).ready(function() {
       $('#new-div ul').append(getAnswerSec(data.answers[key]));
       $('.score[answer-id="' + key + '"]').html(data.answers[key].score);
     }
+    $('#question').html(data.question.question);
   });
   
   function getAnswerSec(data) {
@@ -35,8 +37,7 @@ $(document).ready(function() {
   })
   
   socket.on('get queue', function(data) {
-    console.log('get queue')
-    $('#question-input').attr('placeholder', 'your question is in queue: ' + data);
+    $('#question-input').attr('placeholder', 'your question\'s position in queue: ' + data.place + '/' + data.total);
   });
   
   socket.on('new answer', function(data) {
@@ -46,6 +47,10 @@ $(document).ready(function() {
   socket.on('upvote', function(data) {
     console.log('upvote gotten: ' + data.id);
     $('.score[answer-id="' + data.id + '"]').html(data.score);
+  });
+  
+  socket.on('timer', function(data) {
+    console.log(data);
   });
   
   $("#question-input").keyup(function(event){
@@ -73,10 +78,13 @@ $(document).ready(function() {
 //    console.log('upvote clicked');
 //    socket.emit('upvote', $(this).attr('answer-id'));
 //  });
+  
+
 
   
 });
 function upvote(id) {
   console.log('upvote clicked');
   socket.emit('upvote', id);
+  $('.upvote').toggleClass('upvote-clicked');
 }
