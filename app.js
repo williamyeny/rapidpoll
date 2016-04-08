@@ -53,9 +53,11 @@ socket.on('connection', function(client) {
   });
   
   client.on('submit answer', function(data) {
-    console.log('answer received: ' + data);
-    answers[client.id] = {answer: data, id: client.id, score: 0};
-    socket.emit('new answer', answers[client.id]);
+    if (typeof answers[client.id] == "undefined") {
+      answers[client.id] = [];
+    } 
+    answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
+    socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
   });
   
   client.on('get queue', function() {
@@ -71,18 +73,31 @@ socket.on('connection', function(client) {
   
   client.on('upvote', function(data) {
     for (i in clients[client.id].upvoted) {
-      if (clients[client.id].upvoted[i] == data) {
+      if (clients[client.id].upvoted[i].id == data.id && clients[client.id].upvoted[i].number == data.number) {
         console.log('downvote inc');
         clients[client.id].upvoted.splice(i, 1);
-        answers[data].score--;
-        console.log(answers[data].score);
-        socket.emit('upvote', answers[data]);
+        answers[data.id][data.number].score--;
+        console.log(answers[data.id].score);
+        for (i in answers[data.id]) {
+          if (answers[data.id][i].number == data.number) {
+            socket.emit('upvote', answers[data.id][i]);
+            break;
+          }
+        }
+        
         return;
       }
     }
-    answers[data].score++;
-    socket.emit('upvote', answers[data]);
-    clients[client.id].upvoted.push(data);
+    
+    answers[data.id][data.number].score++;
+    console.log('we upvoting this shit: ' + answers[data.id][data.number].score);
+    for (i in answers[data.id]) {
+      if (answers[data.id][i].number == data.number) {
+        socket.emit('upvote', answers[data.id][i]);
+        break;
+      }
+    }
+    clients[client.id].upvoted.push({id:data.id, number:data.number});
   })
 });
 
@@ -94,6 +109,9 @@ newQuestion();
 
 function newQuestion() {
   answers = {};
+  for (key in clients) {
+    clients[key].upvoted = [];
+  }
   if (Object.keys(questions).length != 0) {
     socket.emit('new question sent', questions[Object.keys(questions)[0]]);
     currentQuestion = questions[Object.keys(questions)[0]];

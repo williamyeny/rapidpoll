@@ -8,14 +8,14 @@ $(document).ready(function() {
   socket.on('join', function(data) {
     id = data.id;
     for (key in data.answers) {
-      $('#new-div ul').append(getAnswerSec(data.answers[key]));
+      $('#answer-list ul').append(getAnswerSec(data.answers[key]));
       $('.score[answer-id="' + key + '"]').html(data.answers[key].score);
     }
     $('#question').html(data.question.question);
   });
   
   function getAnswerSec(data) {
-    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\")' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "'>0</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
+    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>0</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
   }
   
       
@@ -28,6 +28,7 @@ $(document).ready(function() {
       $("#question-input").prop('disabled', false);
       $('#question-input').attr('placeholder', 'ask a question');
       $('#question-submit i').html('send');
+      $('#question-submit').attr('title', '');
     }
     
   });
@@ -42,12 +43,12 @@ $(document).ready(function() {
   });
   
   socket.on('new answer', function(data) {
-    $('#new-div ul').append(getAnswerSec(data));
+    $('#answer-list ul').append(getAnswerSec(data));
   });
   
   socket.on('upvote', function(data) {
     console.log('upvote gotten: ' + data.id);
-    $('.score[answer-id="' + data.id + '"]').html(data.score);
+    $('.score[answer-id="' + data.id + '"][number = "' + data.number + '"]').html(data.score);
   });
   
   socket.on('timer', function(data) {
@@ -72,12 +73,14 @@ $(document).ready(function() {
       $('#question-input').val('');
       $("#question-input").prop('disabled', true);
       $('#question-submit i').html('clear');
+      $('#question-submit').attr('title', 'remove your question from queue');
     } else {
       console.log('clearing question');
       socket.emit('clear question');
       $("#question-input").prop('disabled', false);
       $('#question-input').attr('placeholder', 'ask a question');
       $('#question-submit i').html('send');
+      $('#question-submit').attr('title', '');
     }
   });
   $('#answer-submit').click(function() {
@@ -93,8 +96,8 @@ $(document).ready(function() {
 
   
 });
-function upvote(id) {
+function upvote(id, number) {
   console.log('upvote clicked');
-  socket.emit('upvote', id);
-  $('.upvote').toggleClass('upvote-clicked');
+  socket.emit('upvote', {id:id, number:number});
+  $('.upvote[number="' + number + '"][answer-id="' + number + '"]').toggleClass('upvote-clicked');
 }
