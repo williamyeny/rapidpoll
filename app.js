@@ -21,8 +21,8 @@ socket.on('connection', function(client) {
   
   client.on('join', function() {
     console.log('User with id ' + client.id + " connected")
-    clients[client.id] = " ";
-    client.emit('join', client.id);
+    clients[client.id] = {upvoted: []};
+    client.emit('join', {id: client.id, answers: answers});
     console.log(clients);
   });
   
@@ -56,8 +56,20 @@ socket.on('connection', function(client) {
     }
   });
   
-  client.on('upvote', function() {
-    
+  client.on('upvote', function(data) {
+    for (i in clients[client.id].upvoted) {
+      if (clients[client.id].upvoted[i] == data) {
+        console.log('downvote inc');
+        clients[client.id].upvoted.splice(i, 1);
+        answers[data].score--;
+        console.log(answers[data].score);
+        socket.emit('upvote', answers[data]);
+        return;
+      }
+    }
+    answers[data].score++;
+    socket.emit('upvote', answers[data]);
+    clients[client.id].upvoted.push(data);
   })
 });
 
@@ -65,7 +77,7 @@ http.listen(3000, function(){
   console.log('listening on *:3000');
 });
 
-newQuestion();
+//newQuestion();
 
 function newQuestion() {
   answers = {};

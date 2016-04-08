@@ -1,14 +1,19 @@
+var socket = io();
 $(document).ready(function() {
-  var socket = io();
+  
   var id = "";
   socket.emit('join');
   
   socket.on('join', function(data) {
-    id = data;
+    id = data.id;
+    for (key in data.answers) {
+      $('#new-div ul').append(getAnswerSec(data.answers[key]));
+      $('.score[answer-id="' + key + '"]').html(data.answers[key].score);
+    }
   });
   
   function getAnswerSec(data) {
-    return "<li><div class='answer-sec'><div class='vote-div'><a class='upvote' id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>";
+    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\")' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "'>0</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
   }
   
       
@@ -38,6 +43,11 @@ $(document).ready(function() {
     $('#new-div ul').append(getAnswerSec(data));
   });
   
+  socket.on('upvote', function(data) {
+    console.log('upvote gotten: ' + data.id);
+    $('.score[answer-id="' + data.id + '"]').html(data.score);
+  });
+  
   $("#question-input").keyup(function(event){
     if(event.keyCode == 13){
         $("#question-submit").click();
@@ -59,8 +69,14 @@ $(document).ready(function() {
     socket.emit('submit answer', $('#answer-input').val());
     $('#answer-input').val('');
   });
-  $('.upvote').click(function() {
-    socket.emit('upvote', $(this).attr('id'));
-  });
+//  $('.upvote').click(function() {
+//    console.log('upvote clicked');
+//    socket.emit('upvote', $(this).attr('answer-id'));
+//  });
+
   
 });
+function upvote(id) {
+  console.log('upvote clicked');
+  socket.emit('upvote', id);
+}

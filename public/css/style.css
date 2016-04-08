@@ -61,6 +61,13 @@
   align-items: center;
 }
 
+.score {
+  position:relative;
+  text-align: center;
+  font-size: 0.75em;
+  margin-top:-3px;
+}
+
 .answer-div {
   padding:10px 15px 10px 0px;
   width:310px;
