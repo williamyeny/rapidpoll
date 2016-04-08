@@ -28,6 +28,16 @@ body {
   color:#333333;
 }
 
+#timer {
+  position:absolute;
+  height:5px;
+  width:0px;
+  background-color: #545454;
+  border:solid 1px #545454;
+  border-bottom-left-radius: 3px;
+  margin:15px 0px 0px -20px;
+}
+
 #top-div {
   margin-right: 12px;
 } 

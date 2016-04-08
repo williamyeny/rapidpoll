@@ -56,8 +56,16 @@ socket.on('connection', function(client) {
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
-    answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
-    socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
+    if (answers[client.id].length < 3) {
+      answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
+      socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
+      if (answers[client.id].length == 3) {
+        client.emit('max answers');
+      }
+    } else {
+      console.log('too many answers');
+    }
+    
   });
   
   client.on('get queue', function() {
@@ -119,7 +127,7 @@ function newQuestion() {
     delete questions[Object.keys(questions)[0]];
 //    console.log('deleted ' + questions);
     secondsLeft = questionDuration;
-    socket.emit('timer', secondsLeft);
+    socket.emit('timer', {secondsLeft: secondsLeft, questionDuration: questionDuration});
     timer();
   } else {
     console.log('No questions in queue...');
@@ -137,7 +145,7 @@ function timer() {
     secondsLeft -= 1;
     console.log(secondsLeft);
     if (secondsLeft >= 0) {
-      socket.emit('timer', secondsLeft);
+      socket.emit('timer', {secondsLeft: secondsLeft, questionDuration: questionDuration});
       timer();
     } else {
       newQuestion();

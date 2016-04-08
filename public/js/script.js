@@ -8,14 +8,16 @@ $(document).ready(function() {
   socket.on('join', function(data) {
     id = data.id;
     for (key in data.answers) {
-      $('#answer-list ul').append(getAnswerSec(data.answers[key]));
-      $('.score[answer-id="' + key + '"]').html(data.answers[key].score);
+      for (key2 in data.answers[key]) {
+        $('#answer-list ul').append(getAnswerSec(data.answers[key][key2]));
+      }
     }
+    
     $('#question').html(data.question.question);
   });
   
   function getAnswerSec(data) {
-    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>0</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
+    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
   }
   
       
@@ -30,6 +32,8 @@ $(document).ready(function() {
       $('#question-submit i').html('send');
       $('#question-submit').attr('title', '');
     }
+    $("#answer-input").prop('disabled', false);
+    $('#answer-input').attr('placeholder', 'post an answer');
     
   });
   
@@ -53,6 +57,16 @@ $(document).ready(function() {
   
   socket.on('timer', function(data) {
     console.log(data);
+    if (data.secondsLeft == 0) {
+      $('#timer').css('width', $('#question-div').width() + 30);
+    } else {
+      $('#timer').css('width', ($('#question-div').width() + 20) - ((data.secondsLeft - 1) / data.questionDuration * $('#question-div').width() + 20));
+    }
+  });
+  
+  socket.on('max answers', function() {
+    $("#answer-input").prop('disabled', true);
+    $('#answer-input').attr('placeholder', 'max number of answers reached');
   });
   
   $("#question-input").keyup(function(event){
@@ -92,12 +106,12 @@ $(document).ready(function() {
 //    socket.emit('upvote', $(this).attr('answer-id'));
 //  });
   
-
+  
 
   
 });
 function upvote(id, number) {
   console.log('upvote clicked');
   socket.emit('upvote', {id:id, number:number});
-  $('.upvote[number="' + number + '"][answer-id="' + number + '"]').toggleClass('upvote-clicked');
+  $('.upvote[number="' + number + '"][answer-id="' + id + '"]').toggleClass('upvote-clicked');
 }
