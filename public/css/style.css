@@ -4,6 +4,12 @@
   margin: 0;
   padding: 0;
   font-family: 'roboto';
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+body {
+  padding: 0px 15px 0px 15px;
 }
 
 #container {
@@ -13,7 +19,7 @@
 }
 
 #question-div {
-  width:756px;
+  width:800px;
   padding:20px;
   text-align: center;
   border: solid 2px #dddddd;
@@ -22,22 +28,19 @@
   color:#333333;
 }
 
-.answers {
-  display: inline-block;
-  width:390px;
-  border: solid 2px #dddddd;
-  border-radius: 5px;
-  height:500px;
-  margin-bottom:10px;
-  overflow:auto;
-}
-
 #top-div {
   margin-right: 12px;
 } 
 
 #answer-list {
-
+  display: inline-block;
+  width:500px;
+  border: solid 2px #dddddd;
+  border-radius: 5px;
+  height:500px;
+  margin-bottom:10px;
+  overflow:auto;
+  margin-right:10px;
 }
 
 .vote-div {
@@ -94,11 +97,19 @@ h2 {
   font-weight: 400;
 }
 
-#new-answer-div, #new-question-div {
+#input-container {
+  vertical-align: top;
+  display:inline-block;
+  width:290px;
+  float:right;
+}
+
+.input-div {
   margin-bottom: 10px;
-  width:796px;
+  
   border: solid 2px #dddddd;
   border-radius: 5px;
+  
 /*
   display: flex;
   align-items: center;
@@ -106,7 +117,7 @@ h2 {
 }
 
 input {
-  width:745px;
+  width:250px;
   border:none;
   outline: none;
   padding:8px 0px 8px 12px;
@@ -130,4 +141,36 @@ i {
 
 a {
   cursor: pointer;
+}
+
+@media screen and (max-width:830px) {
+  #container {
+    width:100%;
+    margin-top:20px;
+  }
+  #question-div {
+    width:100%;
+  }
+  
+  #answer-list {
+    margin:0px auto 10px auto;
+    display:block;
+    width:100%;
+    height:400px;
+  }
+  
+  #input-container {
+    margin:0px auto 0px auto;
+    display:block;
+    width:100%;
+  }
+  
+  input {
+    width: calc(100% - 40px);
+  }
+  
+  h1 {
+    font-size:2em;
+  }
+  
 }

@@ -1,6 +1,7 @@
 doctype html
 html
   head
+    meta(name="viewport", content="width=device-width")
     link(href="https://fonts.googleapis.com/icon?family=Material+Icons", rel="stylesheet")
     link(rel='stylesheet', href='/css/style.css')
     script(src='/socket.io/socket.io.js')
@@ -12,19 +13,22 @@ html
       #question-div
         h2#question
         
-      #answer-list.answers
+      #input-container
+        .input-div
+          input#answer-input(type='text', placeholder='post an answer')
+          .submit-div
+            a#answer-submit
+              i.material-icons send
+
+        .input-div
+          input#question-input(type='text', placeholder='ask a question')
+          .submit-div
+            a#question-submit
+              i.material-icons send
+        
+      #answer-list
         ul
       
-      #new-answer-div
-        input#answer-input(type='text', placeholder='post an answer')
-        .submit-div
-          a#answer-submit
-            i.material-icons send
-        
-      #new-question-div
-        input#question-input(type='text', placeholder='ask a question')
-        .submit-div
-          a#question-submit
-            i.material-icons send
+
         
       
