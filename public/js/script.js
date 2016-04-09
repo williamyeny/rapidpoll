@@ -29,7 +29,9 @@ $(document).ready(function() {
     if (data.question.length > 300) {
       data.question = data.question.substring(0, 300);
     }
+    document.title
     $('#question').html(data.question);
+    document.title = 'rapidpoll: ' + data.question;
     socket.emit('get queue');
     console.log('got new question: ' + data.question);
     $('li').remove();
@@ -57,6 +59,7 @@ $(document).ready(function() {
   });
   
   socket.on('new answer', function(data) {
+    
     $('#answer-list ul').append(getAnswerSec(data));
   });
   
