@@ -3,10 +3,12 @@ var app = express();
 var http = require('http').Server(app);
 var path = require('path');
 var socket = require('socket.io')(http);
+var favicon = require('serve-favicon');
 
 app.set('view engine', 'jade');
 app.set('views', __dirname + "/views");
 app.use(express.static(path.join(__dirname, 'public')));
+//app.use(favicon(path.join(__dirname,'public','favicon.ico')));
 
 var clients = {};
 var questions = {};

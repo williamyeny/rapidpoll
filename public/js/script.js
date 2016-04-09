@@ -17,7 +17,7 @@ $(document).ready(function() {
   });
   
   function getAnswerSec(data) {
-    return "<li><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
+    return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
   }
   
       
@@ -53,10 +53,12 @@ $(document).ready(function() {
   socket.on('upvote', function(data) {
     console.log('upvote gotten: ' + data.id);
     $('.score[answer-id="' + data.id + '"][number = "' + data.number + '"]').html(data.score);
+    $('.score[answer-id="' + data.id + '"][number = "' + data.number + '"]').parent().parent().parent().attr('score', data.score);
+    sortAnswers();
+    
   });
   
   socket.on('timer', function(data) {
-    console.log(data);
     if (data.secondsLeft == 0) {
       $('#timer').css('width', $('#question-div').width() + 30);
     } else {
@@ -112,7 +114,7 @@ $(document).ready(function() {
 //    socket.emit('upvote', $(this).attr('answer-id'));
 //  });
   
-  
+
 
   
 });
@@ -120,4 +122,82 @@ function upvote(id, number) {
   console.log('upvote clicked');
   socket.emit('upvote', {id:id, number:number});
   $('.upvote[number="' + number + '"][answer-id="' + id + '"]').toggleClass('upvote-clicked');
+}
+
+function sortAnswers() { //http://jsfiddle.net/MikeGrace/Vgavb/
+  
+// get array of elements
+var myArray = $("#answer-list li");
+var count = 0;
+
+// sort based on timestamp attribute
+myArray.sort(function (a, b) {
+    
+    // convert to integers from strings
+    a = parseInt($(a).attr("score"), 10);
+    b = parseInt($(b).attr("score"), 10);
+    count += 2;
+    // compare
+    if(a > b) {
+        return -1;
+    } else if(a < b) {
+        return 1;
+    } else {
+        return 0;
+    }
+});
+
+console.log(myArray);
+  
+// put sorted results back on page
+$("#answer-list ").append(myArray);
+  
+  
+  
+  
+  
+  
+  
+//  var answers = $('#answer-list ul'),
+//	answersli = answers.children('li');
+//  console.log(answers);
+//  answers.sort(function(a,b){
+////    console.log(a.getChildren('.answer-sec .vote-div .score') + ', ' + b);
+//    var score = $(a).attr('class');
+//    console.log(score);
+//    console.log(a);
+//    var an = a.getAttribute('data-name'),
+//      bn = b.getAttribute('data-name');
+//
+//    if(an > bn) {
+//      return 1;
+//    }
+//    if(an < bn) {
+//      return -1;
+//    }
+//    return 0;
+//  });
+
+//$peopleli.detach().appendTo($people);
+//  console.log('test');
+//  var myArray = $("#answer-list div");
+//  var count = 0;
+//
+//  // sort based on timestamp attribute
+//  myArray.sort(function (a, b) {
+//    console.log($(a).attr('class'));
+//    // convert to integers from strings
+//    a = parseInt($('.' + $(a).attr('class') + ' .answer-sec .vote-div .score').html(), 10);
+//    b = parseInt($('.' + $(b).attr('class') + ' .answer-sec .vote-div .score').html(), 10);
+//    count += 2;
+//    // compare
+//    if(a > b) {
+//        return 1;
+//    } else if(a < b) {
+//        return -1;
+//    } else {
+//        return 0;
+//    }
+//  });
+//  $("#answer-list").append(myArray);
 }
