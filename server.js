@@ -16,6 +16,7 @@ var answers = {};
 var questionDuration = 41;
 var secondsLeft = 0;
 var currentQuestion = {question: '', id: ''};
+var maxAnswers = 3;
 
 
 app.get('/', function(req, res){
@@ -57,10 +58,12 @@ socket.on('connection', function(client) {
     console.log('question received: ' + data);
     if (client.id in questions) {
       console.log('client already has question in queue');
-    } else {
+    } else if (/\S/.test(data)) {
       questions[client.id] = {question: data, id: client.id};
       console.log(questions);
       socket.emit('new question entered', Object.keys(questions).length);
+    } else {
+      console.log('blank question');
     }
   });
   
@@ -74,10 +77,11 @@ socket.on('connection', function(client) {
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
-    if (answers[client.id].length < 3) {
+    if (answers[client.id].length < maxAnswers && /\S/.test(data)) {
+      
       answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
       socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
-      if (answers[client.id].length == 3) {
+      if (answers[client.id].length == maxAnswers) {
         client.emit('max answers');
       }
     } else {

@@ -104,11 +104,13 @@ $(document).ready(function() {
   
   $('#question-submit').click(function() {
     if ($('#question-submit i').html() == 'send') {
-      socket.emit('submit question', $('#question-input').val());
-      $('#question-input').val('');
-      $("#question-input").prop('disabled', true);
-      $('#question-submit i').html('clear');
-      $('#question-submit').attr('title', 'remove your question from queue');
+      if (/\S/.test($('#question-input').val())) {
+        socket.emit('submit question', $('#question-input').val());
+        $('#question-input').val('');
+        $("#question-input").prop('disabled', true);
+        $('#question-submit i').html('clear');
+        $('#question-submit').attr('title', 'remove your question from queue');
+      }
     } else {
       console.log('clearing question');
       socket.emit('clear question');
@@ -119,13 +121,11 @@ $(document).ready(function() {
     }
   });
   $('#answer-submit').click(function() {
-    socket.emit('submit answer', $('#answer-input').val());
+    if (/\S/.test($('#answer-input').val())) {
+      socket.emit('submit answer', $('#answer-input').val());
+    }
     $('#answer-input').val('');
   });
-//  $('.upvote').click(function() {
-//    console.log('upvote clicked');
-//    socket.emit('upvote', $(this).attr('answer-id'));
-//  });
   
   socket.on('remove answers', function(data) {
     $('p[answer-id="' + data + '"]').parent().parent().parent().remove();
