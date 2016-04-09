@@ -7,6 +7,7 @@
   box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
+  word-wrap: break-word;
 }
 body {
   padding: 0px 15px 0px 15px;
@@ -39,6 +40,17 @@ body {
 }
 
 #online {
+  
+}
+
+#links {
+  display:inline-block;
+  margin-bottom: 10px;
+}
+
+
+
+#info {
   margin:0px 0px 5px 8px;
   font-size: 0.8em;
 }
@@ -53,9 +65,7 @@ body {
   border: solid 2px #dddddd;
   border-radius: 5px;
   height:500px;
-  margin-bottom:10px;
   overflow:auto;
-  margin-right:10px;
 }
 
 .vote-div {
@@ -72,10 +82,15 @@ body {
 
 .upvote-clicked {
   color:#545454;
+} 
+
+p {
+  color:#aea9b1;
 }
 
-#question-submit, #answer-submit {
+a {
   color:#545454;
+  cursor: pointer;
 }
 
 .answer-sec {
@@ -155,9 +170,7 @@ i {
   vertical-align: middle; 
 }
 
-a {
-  cursor: pointer;
-}
+
 
 @media screen and (max-width:830px) {
   #container {

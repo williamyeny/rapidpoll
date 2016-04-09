@@ -90,9 +90,10 @@ socket.on('connection', function(client) {
       place++;
       if (key == client.id) {
         client.emit('get queue', {place: place, total: Object.keys(questions).length});
-        break;
+        return;
       }
     }
+    client.emit('get queue', {place: 'n/a', total: Object.keys(questions).length});
   });
   
   client.on('upvote', function(data) {
