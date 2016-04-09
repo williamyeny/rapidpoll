@@ -17,11 +17,12 @@ $(document).ready(function() {
   });
   
   function getAnswerSec(data) {
-    return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
+    return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer.replace(/</g, "&lt;").replace(/>/g, "&gt;") + "</p></div></div></li>";
+    console.log(data.answer);
   }
       
   socket.on('new question sent', function(data) {
-    $('#question').html(data.question);
+    $('#question').html(data.question.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
     socket.emit('get queue');
     console.log('got new question: ' + data.question);
     $('li').remove();
@@ -153,7 +154,10 @@ console.log(myArray);
   
 // put sorted results back on page
 $("#answer-list ").append(myArray);
-  
+
+function validate( html ) {
+    return $( $.parseHTML(html) ).text();
+}
   
   
   

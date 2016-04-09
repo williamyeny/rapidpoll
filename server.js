@@ -54,7 +54,7 @@ socket.on('connection', function(client) {
   
   client.on('submit question', function(data) {
     console.log('question received: ' + data);
-    
+    data.replace('<script>','don\'t inject scripts pls');
     if (client.id in questions) {
       console.log('client already has question in queue');
     } else {
@@ -73,6 +73,7 @@ socket.on('connection', function(client) {
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
+    data.replace('<script>','don\'t inject scripts pls');
     if (answers[client.id].length < 3) {
       answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
       socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
@@ -160,7 +161,6 @@ function newQuestion() {
 function timer() {
   setTimeout(function() {
     secondsLeft -= 1;
-    console.log(secondsLeft);
     if (secondsLeft >= 0) {
       socket.emit('timer', {secondsLeft: secondsLeft, questionDuration: questionDuration});
       timer();
