@@ -53,7 +53,7 @@ $(document).ready(function() {
     console.log('upvote gotten: ' + data.id);
     $('.score[answer-id="' + data.id + '"][number = "' + data.number + '"]').html(data.score);
     $('.score[answer-id="' + data.id + '"][number = "' + data.number + '"]').parent().parent().parent().attr('score', data.score);
-    sortAnswers();
+    //sortAnswers();
     
   });
   
