@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var clients = {};
 var questions = {};
 var answers = {};
-var questionDuration = 21;
+var questionDuration = 41;
 var secondsLeft = 0;
 var currentQuestion = {question: '', id: ''};
 
