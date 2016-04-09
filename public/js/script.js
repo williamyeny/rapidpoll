@@ -64,8 +64,14 @@ $(document).ready(function() {
     }
   });
   
+  socket.on('clients online', function(data) {
+    console.log(data);
+    $('#online').html('clients online: ' + data);
+  });
+  
   socket.on('max answers', function() {
     $("#answer-input").prop('disabled', true);
+    $('#answer-input').val('');
     $('#answer-input').attr('placeholder', 'max number of answers reached');
   });
   

@@ -27,12 +27,25 @@ socket.on('connection', function(client) {
     clients[client.id] = {upvoted: []};
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     console.log(clients);
+    socket.emit('clients online', Object.keys(clients).length);
   });
   
   client.on('disconnect', function() {
     console.log('User ' + client.id + " disconnected")
     delete questions[client.id];
+    var upvotedId;
+    var upvotedNumber;
+    if (typeof clients[client.id] != 'undefined') {
+      for (i in clients[client.id].upvoted) {
+        upvotedId = clients[client.id].upvoted[i].id;
+        upvotedNumber = clients[client.id].upvoted[i].number;
+        
+        answers[upvotedId][upvotedNumber].score--;
+        socket.emit('upvote', answers[upvotedId][upvotedNumber]);
+      }
+    }
     delete clients[client.id];
+    socket.emit('clients online', Object.keys(clients).length);
   });
   
   client.on('submit question', function(data) {
