@@ -145,7 +145,7 @@ function newQuestion() {
   } else {
     console.log('No questions in queue...');
     currentQuestion = {question: '', id: ''};
-    socket.emit('new question sent', {question: 'no questions in queue, why don\'t you start us off and create a new one?', id:'n/a'})
+    socket.emit('new question sent', {question: 'no questions, why don\'t you start us off and create a new one?', id:'n/a'})
     setTimeout(function(){
       
       newQuestion();
