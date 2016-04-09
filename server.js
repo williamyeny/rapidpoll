@@ -46,6 +46,8 @@ socket.on('connection', function(client) {
         socket.emit('upvote', answers[upvotedId][upvotedNumber]);
       }
     }
+    delete answers[client.id];
+    socket.emit('remove answers', client.id);
     delete clients[client.id];
     socket.emit('clients online', Object.keys(clients).length);
   });

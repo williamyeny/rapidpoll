@@ -19,7 +19,6 @@ $(document).ready(function() {
   function getAnswerSec(data) {
     return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>"
   }
-  
       
   socket.on('new question sent', function(data) {
     $('#question').html(data.question);
@@ -114,6 +113,9 @@ $(document).ready(function() {
 //    socket.emit('upvote', $(this).attr('answer-id'));
 //  });
   
+  socket.on('remove answers', function(data) {
+    $('p[answer-id="' + data + '"]').parent().parent().parent().remove();
+  });
 
 
   
