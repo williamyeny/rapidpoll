@@ -54,7 +54,6 @@ socket.on('connection', function(client) {
   
   client.on('submit question', function(data) {
     console.log('question received: ' + data);
-    data.replace('<script>','don\'t inject scripts pls');
     if (client.id in questions) {
       console.log('client already has question in queue');
     } else {
