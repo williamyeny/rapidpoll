@@ -72,7 +72,6 @@ socket.on('connection', function(client) {
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
-    data.replace('<script>','don\'t inject scripts pls');
     if (answers[client.id].length < 3) {
       answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
       socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
