@@ -53,6 +53,7 @@ socket.on('connection', function(client) {
   });
   
   client.on('submit question', function(data) {
+    data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     console.log('question received: ' + data);
     if (client.id in questions) {
       console.log('client already has question in queue');
@@ -69,6 +70,7 @@ socket.on('connection', function(client) {
   });
   
   client.on('submit answer', function(data) {
+    data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
