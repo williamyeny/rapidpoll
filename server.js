@@ -111,7 +111,6 @@ socket.on('connection', function(client) {
       }
     }
     
-    answers[data.id][data.number].score++;][data.number].score);
     for (i in answers[data.id]) {
       if (answers[data.id][i].number == data.number) {
         socket.emit('upvote', answers[data.id][i]);
