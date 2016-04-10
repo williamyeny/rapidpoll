@@ -139,8 +139,9 @@ $(document).ready(function() {
     $('#answer-input').val('');
   });
   
-  socket.on('remove answers', function(data) {
+  socket.on('client disconnect', function(data) {
     $('p[answer-id="' + data + '"]').parent().parent().parent().remove();
+    socket.emit('get queue');
   });
 
 

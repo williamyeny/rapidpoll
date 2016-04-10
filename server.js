@@ -49,7 +49,7 @@ socket.on('connection', function(client) {
       }
     
       delete answers[client.id];
-      socket.emit('remove answers', client.id);
+      socket.emit('client disconnect', client.id);
 
     } catch (err) {
       console.log('error on disconnect (delete question/answers): ' + err);
