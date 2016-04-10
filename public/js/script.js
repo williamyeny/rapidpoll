@@ -56,7 +56,7 @@ $(document).ready(function() {
   
   socket.on('get queue', function(data) {
     if (data.place != 'n/a') {
-      $('#question-input').attr('placeholder', 'your question\'s position in queue: ' + data.place + '/' + data.total);
+      $('#question-input').attr('placeholder', 'position in queue: ' + data.place + '/' + data.total);
     }
     $('#queue').html('questions in queue: ' + data.total);
   });
