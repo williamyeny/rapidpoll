@@ -129,6 +129,7 @@ $(document).ready(function() {
       $('#question-input').attr('placeholder', 'ask a question');
       $('#question-submit i').html('send');
       $('#question-submit').attr('title', '');
+      socket.emit('get queue');
     }
   });
   $('#answer-submit').click(function() {
