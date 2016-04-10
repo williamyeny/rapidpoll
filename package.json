@@ -1,6 +1,6 @@
 {
   "name": "rapidpoll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "a rapid poll",
   "main": "app.js",
   "scripts": {
