@@ -34,7 +34,8 @@ socket.on('connection', function(client) {
   
   client.on('disconnect', function() {
     console.log('User ' + client.id + " disconnected")
-
+    
+    //deletes: questions, answers, upvotes
     try {
       delete questions[client.id];
       var upvotedId;
@@ -46,7 +47,6 @@ socket.on('connection', function(client) {
         answers[upvotedId][upvotedNumber].score--;
         socket.emit('upvote', answers[upvotedId][upvotedNumber]);
       }
-
     
       delete answers[client.id];
       socket.emit('remove answers', client.id);
@@ -55,6 +55,7 @@ socket.on('connection', function(client) {
       console.log('error on disconnect (delete question/answers): ' + err);
     }
     
+    //remove client
     try {
       delete clients[client.id];
       socket.emit('clients online', Object.keys(clients).length);
@@ -68,7 +69,8 @@ socket.on('connection', function(client) {
       data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
       console.log('question received: ' + data);
       if (client.id in questions) {
-      } else if (/\S/.test(data)) {
+        console.log('smartass bypassed the frontend to try to add multiple questions');
+      } else if (/\S/.test(data)) { //checks for empty/whitespace
         questions[client.id] = {question: data, id: client.id};
         socket.emit('new question entered', Object.keys(questions).length);
       }
@@ -88,7 +90,7 @@ socket.on('connection', function(client) {
       if (typeof answers[client.id] == "undefined") {
         answers[client.id] = [];
       } 
-      if (answers[client.id].length < maxAnswers && /\S/.test(data)) {
+      if (answers[client.id].length < maxAnswers && /\S/.test(data)) { //checks for empty/whitespace
 
         answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
         socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
@@ -111,6 +113,7 @@ socket.on('connection', function(client) {
         return;
       }
     }
+    //client has no questions, only return length of queue
     client.emit('get queue', {place: 'n/a', total: Object.keys(questions).length});
   });
   
@@ -122,25 +125,13 @@ socket.on('connection', function(client) {
           clients[client.id].upvoted.splice(i, 1);
           answers[data.id][data.number].score--;
           socket.emit('upvote', answers[data.id][data.number]);
-//          for (i in answers[data.id]) {
-//            if (answers[data.id][i].number == data.number) {
-//              socket.emit('upvote', answers[data.id][i]);
-//              break;
-//            }
-//          }
           //makes sure it doesn't upvote it back
           return;
         }
       }
-
+      //otherwise increment it
       answers[data.id][data.number].score++;
       socket.emit('upvote', answers[data.id][data.number]);
-//      for (i in answers[data.id]) {
-//        if (answers[data.id][i].number == data.number) {
-//          socket.emit('upvote', answers[data.id][i]);
-//          break;
-//        }
-//      }
       clients[client.id].upvoted.push({id:data.id, number:data.number});
       
     } catch (err) {
@@ -150,27 +141,28 @@ socket.on('connection', function(client) {
   
 });
 
-http.listen(process.env.PORT || 3000, function(){
-  console.log('listening on *:3000');
+var port = process.env.PORT || 3000;
+http.listen(port, function(){
+  console.log('listening on port: ' + port);
 });
 
 newQuestion();
 
 function newQuestion() {
   answers = {};
-  for (key in clients) {
-    clients[key].upvoted = [];
+  for (key in clients) { 
+    clients[key].upvoted = []; 
   }
   if (Object.keys(questions).length != 0) {
     socket.emit('new question sent', questions[Object.keys(questions)[0]]);
-    currentQuestion = questions[Object.keys(questions)[0]];
+    currentQuestion = questions[Object.keys(questions)[0]]; //transfers from queue
+    delete questions[Object.keys(questions)[0]]; //deletes first in queue
     
-    delete questions[Object.keys(questions)[0]];
-//    console.log('deleted ' + questions);
+    //start timer
     secondsLeft = questionDuration;
     socket.emit('timer', {secondsLeft: secondsLeft, questionDuration: questionDuration});
     timer();
-  } else {
+  } else { //no questions
     console.log('No questions in queue...');
     currentQuestion = {question: '', id: 'n/a'};
     socket.emit('new question sent', {question: 'no questions, why don\'t you start us off and create a new one?', id:'n/a'})
@@ -181,6 +173,7 @@ function newQuestion() {
   }
 }
 
+//loops every second and emits timer data to client
 function timer() {
   setTimeout(function() {
     secondsLeft -= 1;
