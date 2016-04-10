@@ -4,6 +4,7 @@ var http = require('http').Server(app);
 var path = require('path');
 var socket = require('socket.io')(http);
 var favicon = require('serve-favicon');
+var escape = require('escape-html');
 
 app.set('view engine', 'jade');
 app.set('views', __dirname + "/views");
@@ -17,6 +18,7 @@ var questionDuration = 41;
 var secondsLeft = 0;
 var currentQuestion = {question: '', id: ''};
 var maxAnswers = 3;
+var maxTextLength = 400;
 
 
 app.get('/', function(req, res){
@@ -66,13 +68,17 @@ socket.on('connection', function(client) {
   
   client.on('submit question', function(data) {
     try {
-      data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      data = escape(data);
+      if (data.length > maxTextLength) {
+        data = data.substring(0, maxTextLength);
+      }
       console.log('question received: ' + data);
       if (client.id in questions) {
         console.log('smartass bypassed the frontend to try to add multiple questions');
       } else if (/\S/.test(data)) { //checks for empty/whitespace
         questions[client.id] = {question: data, id: client.id};
         socket.emit('new question entered', Object.keys(questions).length);
+        
       }
     } catch (err) {
       console.log('error on submit question: ' + err);
@@ -85,7 +91,10 @@ socket.on('connection', function(client) {
   
   client.on('submit answer', function(data) {
     try {
-      data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      data = escape(data);
+      if (data.length > maxTextLength) {
+        data = data.substring(0, maxTextLength);
+      }
       console.log('answer received: ' + data);
       if (typeof answers[client.id] == "undefined") {
         answers[client.id] = [];
