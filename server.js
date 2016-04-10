@@ -29,7 +29,6 @@ socket.on('connection', function(client) {
     console.log('User with id ' + client.id + " connected")
     clients[client.id] = {upvoted: []};
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
-    console.log(clients);
     socket.emit('clients online', Object.keys(clients).length);
   });
   
@@ -57,23 +56,19 @@ socket.on('connection', function(client) {
     data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     console.log('question received: ' + data);
     if (client.id in questions) {
-      console.log('client already has question in queue');
     } else if (/\S/.test(data)) {
       questions[client.id] = {question: data, id: client.id};
-      console.log(questions);
       socket.emit('new question entered', Object.keys(questions).length);
-    } else {
-      console.log('blank question');
     }
   });
   
   client.on('clear question', function() {
     delete questions[client.id];
-    console.log('cleared question, ' + questions);
   });
   
   client.on('submit answer', function(data) {
     data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    console.log('answer received: ' + data);
     if (typeof answers[client.id] == "undefined") {
       answers[client.id] = [];
     } 
@@ -84,8 +79,6 @@ socket.on('connection', function(client) {
       if (answers[client.id].length == maxAnswers) {
         client.emit('max answers');
       }
-    } else {
-      console.log('too many answers');
     }
     
   });
@@ -105,10 +98,8 @@ socket.on('connection', function(client) {
   client.on('upvote', function(data) {
     for (i in clients[client.id].upvoted) {
       if (clients[client.id].upvoted[i].id == data.id && clients[client.id].upvoted[i].number == data.number) {
-        console.log('downvote inc');
         clients[client.id].upvoted.splice(i, 1);
         answers[data.id][data.number].score--;
-        console.log(answers[data.id].score);
         for (i in answers[data.id]) {
           if (answers[data.id][i].number == data.number) {
             socket.emit('upvote', answers[data.id][i]);
@@ -120,8 +111,7 @@ socket.on('connection', function(client) {
       }
     }
     
-    answers[data.id][data.number].score++;
-    console.log('we upvoting this shit: ' + answers[data.id][data.number].score);
+    answers[data.id][data.number].score++;][data.number].score);
     for (i in answers[data.id]) {
       if (answers[data.id][i].number == data.number) {
         socket.emit('upvote', answers[data.id][i]);
@@ -146,7 +136,7 @@ function newQuestion() {
   if (Object.keys(questions).length != 0) {
     socket.emit('new question sent', questions[Object.keys(questions)[0]]);
     currentQuestion = questions[Object.keys(questions)[0]];
-    console.log('id of question to be deleted: ' + Object.keys(questions)[0]);
+    
     delete questions[Object.keys(questions)[0]];
 //    console.log('deleted ' + questions);
     secondsLeft = questionDuration;
