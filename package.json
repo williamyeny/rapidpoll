@@ -9,6 +9,7 @@
   "author": "William Ye",
   "license": "ISC",
   "dependencies": {
+    "escape-html": "^1.0.3",
     "express": "^4.13.4",
     "jade": "^1.11.0",
     "serve-favicon": "^2.3.0",
