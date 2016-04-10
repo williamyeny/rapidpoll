@@ -4,6 +4,8 @@ $(document).ready(function() {
   var id = "";
   socket.emit('join');
   var mSecondsLeft = 0;
+  var maxTextLength = 300;
+  var defaultQuestionId = 'n/a';
   
   socket.on('join', function(data) {
     id = data.id;
@@ -14,6 +16,10 @@ $(document).ready(function() {
     }
     
     $('#question').html(data.question.question);
+    if (data.question.id !== defaultQuestionId) {
+      $("#answer-input").prop('disabled', false);
+      $('#answer-input').attr('placeholder', 'post an answer');
+    }
     socket.emit('get queue');
   });
   
@@ -41,8 +47,13 @@ $(document).ready(function() {
       $('#question-submit i').html('send');
       $('#question-submit').attr('title', '');
     }
-    $("#answer-input").prop('disabled', false);
-    $('#answer-input').attr('placeholder', 'post an answer');
+    if (data.id !== defaultQuestionId) {
+      $("#answer-input").prop('disabled', false);
+      $('#answer-input').attr('placeholder', 'post an answer');
+    } else {
+      $("#answer-input").prop('disabled', true);
+      $('#answer-input').attr('placeholder', 'no question to answer');
+    }
     
   });
   
