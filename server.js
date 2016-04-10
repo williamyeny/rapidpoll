@@ -16,7 +16,7 @@ var questions = {};
 var answers = {};
 var questionDuration = 41;
 var secondsLeft = 0;
-var currentQuestion = {question: '', id: ''};
+var currentQuestion = {question: 'no questions, why don\'t you start us off and create a new one?', id: 'n/a'};
 var maxAnswers = 3;
 var maxTextLength = 400;
 
@@ -78,7 +78,9 @@ socket.on('connection', function(client) {
       } else if (/\S/.test(data)) { //checks for empty/whitespace
         questions[client.id] = {question: data, id: client.id};
         socket.emit('new question entered', Object.keys(questions).length);
-        
+        if (Object.keys(questions).length == 1 && currentQuestion.id == 'n/a') {
+          newQuestion();
+        }
       }
     } catch (err) {
       console.log('error on submit question: ' + err);
@@ -155,8 +157,6 @@ http.listen(port, function(){
   console.log('listening on port: ' + port);
 });
 
-newQuestion();
-
 function newQuestion() {
   answers = {};
   for (key in clients) { 
@@ -173,12 +173,8 @@ function newQuestion() {
     timer();
   } else { //no questions
     console.log('No questions in queue...');
-    currentQuestion = {question: '', id: 'n/a'};
+    currentQuestion = {question: 'no questions, why don\'t you start us off and create a new one?', id: 'n/a'};
     socket.emit('new question sent', {question: 'no questions, why don\'t you start us off and create a new one?', id:'n/a'})
-    setTimeout(function(){
-      
-      newQuestion();
-    }, 2000);
   }
 }
 
