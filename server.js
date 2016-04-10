@@ -22,8 +22,7 @@ app.get('/', function(req, res){
   res.render('index');
 });
 
-socket.on('connection', function(client) {
-
+function runClient(client) {
   client.on('join', function() {
     console.log('User with id ' + client.id + " connected");
     clients[client.id] = {upvoted: []};
@@ -129,6 +128,14 @@ socket.on('connection', function(client) {
     }
     clients[client.id].upvoted.push({id:data.id, number:data.number});
   });
+}
+
+socket.on('connection', function(client) {
+  try {
+    runClient(client);
+  } catch (e) {
+    console.error('Client crashed with error: ', e);
+  }
 });
 
 var port = process.env.PORT || 3000;
