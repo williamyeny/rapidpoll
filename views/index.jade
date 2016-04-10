@@ -14,12 +14,12 @@ html
       
       #question-div
         
-        h2#question
+        h2#question loading...
         #timer
         
       #input-container
         .input-div
-          input#answer-input(type='text', placeholder='post an answer')
+          input#answer-input(type='text', disabled, placeholder='no question to answer')
           .submit-div
             a#answer-submit
               i.material-icons send
@@ -50,7 +50,6 @@ html
             <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top" id="paypal">
             <input type="hidden" name="cmd" value="_s-xclick">
             <input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----
-
             ">
             <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
             </form>
