@@ -3,6 +3,8 @@ $(document).ready(function() {
 
   var id = "";
   var mSecondsLeft = 0;
+  var maxTextLength = 300;
+  var defaultQuestionId = 'n/a';
 
   socket.emit('join');
 
@@ -15,34 +17,43 @@ $(document).ready(function() {
     }
 
     $('#question').html(data.question.question);
+    if (data.question.id !== defaultQuestionId) {
+      $("#answer-input").prop('disabled', false);
+      $('#answer-input').attr('placeholder', 'post an answer');
+    }
+
     socket.emit('get queue');
   });
   function getAnswerSec(data) {
-    if (data.answer.length > 300) {
-      data.answer = data.answer.substring(0, 300);
+    if (data.answer.length > maxTextLength) {
+      data.answer = data.answer.substring(0, maxTextLength);
     }
     console.log(data.answer);
     return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>";
   }
 
   socket.on('new question sent', function(data) {
-    if (data.question.length > 300) {
-      data.question = data.question.substring(0, 300);
+    if (data.question.length > maxTextLength) {
+      data.question = data.question.substring(0, maxTextLength);
     }
     $('#question').html(data.question);
     document.title = 'rapidpoll: ' + data.question;
     socket.emit('get queue');
     console.log('got new question: ' + data.question);
     $('li').remove();
-    if (id == data.id) {
+    if (id === data.id) {
       $("#question-input").prop('disabled', false);
       $('#question-input').attr('placeholder', 'ask a question');
       $('#question-submit i').html('send');
       $('#question-submit').attr('title', '');
     }
-    $("#answer-input").prop('disabled', false);
-    $('#answer-input').attr('placeholder', 'post an answer');
 
+    if (data.id !== defaultQuestionId) {
+      $("#answer-input").prop('disabled', false);
+      $('#answer-input').attr('placeholder', 'post an answer');
+    } else {
+      $('#answer-input').attr('placeholder', 'no question to answer');
+    }
   });
 
   socket.on('new question entered', function(data) {
@@ -87,20 +98,26 @@ $(document).ready(function() {
     $('#answer-input').attr('placeholder', 'max number of answers reached');
   });
 
+  socket.on('max questions',  function() {
+    $("#question-input").prop('disabled', true);
+    $('#question-input').val('');
+    $('#question-input').attr('placeholder', 'max number of questions reached');
+  })
+
   $("#question-input").keyup(function(event){
-    if(event.keyCode == 13){
+    if(event.keyCode === 13){
       $("#question-submit").click();
     }
   });
 
   $("#answer-input").keyup(function(event){
-    if(event.keyCode == 13){
+    if(event.keyCode === 13){
       $("#answer-submit").click();
     }
   });
 
   $('#question-submit').click(function() {
-    if ($('#question-submit i').html() == 'send') {
+    if ($('#question-submit i').html() === 'send') {
       if (/\S/.test($('#question-input').val())) {
         socket.emit('submit question', $('#question-input').val());
         $('#question-input').val('');
@@ -131,8 +148,9 @@ $(document).ready(function() {
 });
 function upvote(id, number) {
   console.log('upvote clicked');
-  socket.emit('upvote', {id:id, number:number});
+  socket.emit('upvote', {id:id, number:parseInt(number)});
   $('.upvote[number="' + number + '"][answer-id="' + id + '"]').toggleClass('upvote-clicked');
+
 }
 
 function sortAnswers() { //http://jsfiddle.net/MikeGrace/Vgavb/
