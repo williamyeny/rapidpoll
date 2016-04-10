@@ -26,7 +26,7 @@ app.get('/', function(req, res){
 socket.on('connection', function(client) {
   
   client.on('join', function() {
-    console.log('User with id ' + client.id + " connected")
+    console.log('User ' + client.id + " connected")
     clients[client.id] = {upvoted: []};
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     socket.emit('clients online', Object.keys(clients).length);
@@ -34,10 +34,11 @@ socket.on('connection', function(client) {
   
   client.on('disconnect', function() {
     console.log('User ' + client.id + " disconnected")
-    delete questions[client.id];
-    var upvotedId;
-    var upvotedNumber;
-    if (typeof clients[client.id] != 'undefined') {
+
+    try {
+      delete questions[client.id];
+      var upvotedId;
+      var upvotedNumber;
       for (i in clients[client.id].upvoted) {
         upvotedId = clients[client.id].upvoted[i].id;
         upvotedNumber = clients[client.id].upvoted[i].number;
@@ -45,20 +46,34 @@ socket.on('connection', function(client) {
         answers[upvotedId][upvotedNumber].score--;
         socket.emit('upvote', answers[upvotedId][upvotedNumber]);
       }
+
+    
+      delete answers[client.id];
+      socket.emit('remove answers', client.id);
+
+    } catch (err) {
+      console.log('error on disconnect (delete question/answers): ' + err);
     }
-    delete answers[client.id];
-    socket.emit('remove answers', client.id);
-    delete clients[client.id];
-    socket.emit('clients online', Object.keys(clients).length);
+    
+    try {
+      delete clients[client.id];
+      socket.emit('clients online', Object.keys(clients).length);
+    } catch (err) {
+      console.log('error on disconnect (remove client): ' + err);
+    }
   });
   
   client.on('submit question', function(data) {
-    data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    console.log('question received: ' + data);
-    if (client.id in questions) {
-    } else if (/\S/.test(data)) {
-      questions[client.id] = {question: data, id: client.id};
-      socket.emit('new question entered', Object.keys(questions).length);
+    try {
+      data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      console.log('question received: ' + data);
+      if (client.id in questions) {
+      } else if (/\S/.test(data)) {
+        questions[client.id] = {question: data, id: client.id};
+        socket.emit('new question entered', Object.keys(questions).length);
+      }
+    } catch (err) {
+      console.log('error on submit question: ' + err);
     }
   });
   
@@ -67,18 +82,22 @@ socket.on('connection', function(client) {
   });
   
   client.on('submit answer', function(data) {
-    data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    console.log('answer received: ' + data);
-    if (typeof answers[client.id] == "undefined") {
-      answers[client.id] = [];
-    } 
-    if (answers[client.id].length < maxAnswers && /\S/.test(data)) {
-      
-      answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
-      socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
-      if (answers[client.id].length == maxAnswers) {
-        client.emit('max answers');
+    try {
+      data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      console.log('answer received: ' + data);
+      if (typeof answers[client.id] == "undefined") {
+        answers[client.id] = [];
+      } 
+      if (answers[client.id].length < maxAnswers && /\S/.test(data)) {
+
+        answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
+        socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
+        if (answers[client.id].length == maxAnswers) {
+          client.emit('max answers');
+        }
       }
+    } catch (err) {
+      console.log('error on submit answer: ' + err);
     }
     
   });
@@ -96,30 +115,39 @@ socket.on('connection', function(client) {
   });
   
   client.on('upvote', function(data) {
-    for (i in clients[client.id].upvoted) {
-      if (clients[client.id].upvoted[i].id == data.id && clients[client.id].upvoted[i].number == data.number) {
-        clients[client.id].upvoted.splice(i, 1);
-        answers[data.id][data.number].score--;
-        for (i in answers[data.id]) {
-          if (answers[data.id][i].number == data.number) {
-            socket.emit('upvote', answers[data.id][i]);
-            break;
-          }
+    try {
+      for (i in clients[client.id].upvoted) {
+        //checks to see if it's already upvoted
+        if (clients[client.id].upvoted[i].id == data.id && clients[client.id].upvoted[i].number == data.number) {
+          clients[client.id].upvoted.splice(i, 1);
+          answers[data.id][data.number].score--;
+          socket.emit('upvote', answers[data.id][data.number]);
+//          for (i in answers[data.id]) {
+//            if (answers[data.id][i].number == data.number) {
+//              socket.emit('upvote', answers[data.id][i]);
+//              break;
+//            }
+//          }
+          //makes sure it doesn't upvote it back
+          return;
         }
-        
-        return;
       }
+
+      answers[data.id][data.number].score++;
+      socket.emit('upvote', answers[data.id][data.number]);
+//      for (i in answers[data.id]) {
+//        if (answers[data.id][i].number == data.number) {
+//          socket.emit('upvote', answers[data.id][i]);
+//          break;
+//        }
+//      }
+      clients[client.id].upvoted.push({id:data.id, number:data.number});
+      
+    } catch (err) {
+      console.log('error on upvote: ' + err);
     }
-    
-    answers[data.id][data.number].score++;
-    for (i in answers[data.id]) {
-      if (answers[data.id][i].number == data.number) {
-        socket.emit('upvote', answers[data.id][i]);
-        break;
-      }
-    }
-    clients[client.id].upvoted.push({id:data.id, number:data.number});
-  })
+  });
+  
 });
 
 http.listen(process.env.PORT || 3000, function(){
