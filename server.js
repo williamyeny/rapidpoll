@@ -105,7 +105,7 @@ socket.on('connection', function(client) {
       if (typeof answers[client.id] == "undefined") {
         answers[client.id] = [];
       } 
-      if (typeof mutedIps[clients[client.id].ip] == 'undefined') { //is the ip muted?  
+      if (typeof mutedIps[clients[client.id].ip] == 'undefined') { //is the ip not muted?  
         if (answers[client.id].length < maxAnswers && /\S/.test(data)) { //checks for empty/whitespace
 
           //adds answer to hash that lasts 1 second
