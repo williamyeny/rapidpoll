@@ -37,6 +37,9 @@ body {
   }
 }
 
+#ip {
+  display:none;
+}
 .rainbow {
   animation: colorRotate 1s linear 0s infinite;
 }
