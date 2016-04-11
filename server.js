@@ -33,7 +33,7 @@ socket.on('connection', function(client) {
   client.on('join', function() {
     console.log('User ' + client.id + " connected")
     clients[client.id] = {upvoted: [], ip: client.request.connection.remoteAddress, muted: false};
-    console.log(client.request.connection.remoteAddress);
+    console.log(client);
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     socket.emit('clients online', Object.keys(clients).length);
   });
