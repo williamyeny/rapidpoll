@@ -23,7 +23,14 @@ $(document).ready(function() {
   });
   
   function getAnswerSec(data) {
-    return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p>" + data.answer + "</p></div></div></li>";
+    
+    var rainbowIndex = data.answer.indexOf('!rainbow');
+    var classP = '';
+    if (rainbowIndex > -1) {
+      data.answer = data.answer.replace('!rainbow','');
+      classP = ' class="rainbow"';
+    }
+    return "<li score='" + data.score + "'><div class='answer-sec'><div class='vote-div'><a onclick='upvote(\"" + data.id + "\", \"" + data.number + "\")' number='" + data.number + "' class='upvote' answer-id='" + data.id + "'><i class='material-icons'>arrow_upward</i></a><p class='score' answer-id='" + data.id + "' number='" + data.number + "'>" + data.score + "</p></div><div class='answer-div'><p" + classP + ">" + data.answer + "</p></div></div></li>";
     console.log(data.answer);
   }
       
