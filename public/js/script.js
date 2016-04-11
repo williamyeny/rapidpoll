@@ -52,6 +52,7 @@ $(document).ready(function() {
     } else {
       $("#answer-input").prop('disabled', true);
       $('#answer-input').attr('placeholder', 'no question to answer');
+      $('#answer-input').val('');
     }
     
   });
