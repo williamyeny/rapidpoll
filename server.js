@@ -19,7 +19,10 @@ var secondsLeft = 0;
 var currentQuestion = {question: 'no questions, why don\'t you start us off and create a new one?', id: 'n/a'};
 var maxAnswers = 3;
 var maxTextLength = 400;
-
+var answersInSecond = {};
+var mutedIps = {};
+var maxAnswersPerSecond = 3;
+var muteLength = 60;
 
 app.get('/', function(req, res){
   res.render('index');
@@ -29,7 +32,8 @@ socket.on('connection', function(client) {
   
   client.on('join', function() {
     console.log('User ' + client.id + " connected")
-    clients[client.id] = {upvoted: []};
+    clients[client.id] = {upvoted: [], ip: client.request.connection.remoteAddress, muted: false};
+    console.log(client.request.connection.remoteAddress);
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     socket.emit('clients online', Object.keys(clients).length);
   });
@@ -101,13 +105,35 @@ socket.on('connection', function(client) {
       if (typeof answers[client.id] == "undefined") {
         answers[client.id] = [];
       } 
-      if (answers[client.id].length < maxAnswers && /\S/.test(data)) { //checks for empty/whitespace
+      if (typeof mutedIps[clients[client.id].ip] == 'undefined') { //is the ip muted?  
+        if (answers[client.id].length < maxAnswers && /\S/.test(data)) { //checks for empty/whitespace
 
-        answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
-        socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
-        if (answers[client.id].length == maxAnswers) {
-          client.emit('max answers');
+          //adds answer to hash that lasts 1 second
+          if (typeof answersInSecond[clients[client.id].ip] == "undefined") {
+            answersInSecond[clients[client.id].ip] = 1;
+          } else {
+            answersInSecond[clients[client.id].ip] ++;
+          }
+
+          if (answersInSecond[clients[client.id].ip] > maxAnswersPerSecond) { //if more than x answers per second...
+            mutedIps[clients[client.id].ip] = muteLength;
+            console.log('ip ' + clients[client.id].ip + ' muted for ' + muteLength + ' seconds');
+
+            //delete muted IP after mutelength
+            unmute(clients[client.id].ip);
+          }
+
+
+          answers[client.id].push({answer: data, id: client.id, score: 0, number:answers[client.id].length});
+          socket.emit('new answer', answers[client.id][answers[client.id].length - 1]);
+          if (answers[client.id].length == maxAnswers) {
+            client.emit('max answers');
+          }
+
+
         }
+      } else {
+        console.log('ip ' + mutedIps[clients[client.id].ip] + ' is muted, no answer sent');
       }
     } catch (err) {
       console.log('error on submit answer: ' + err);
@@ -117,7 +143,7 @@ socket.on('connection', function(client) {
   
   client.on('get queue', function() {
     var place = 0;
-    for(var key in questions) {
+    for (var key in questions) {
       place++;
       if (key == client.id) {
         client.emit('get queue', {place: place, total: Object.keys(questions).length});
@@ -178,10 +204,23 @@ function newQuestion() {
   }
 }
 
+function unmute(ip) { //unmutes ip after mutelength seconds
+  setTimeout(function() {
+    try {
+      delete mutedIps[ip];
+      console.log('ip ' + ip + ' unmuted');
+    } catch (err) {
+      console.log('error in unmuting IP: ' + err);
+    }
+  }, muteLength*1000);
+}
+
 //loops every second and emits timer data to client
 function timer() {
   setTimeout(function() {
     secondsLeft -= 1;
+    answersInSecond = {}; //makes sure this is empty every second
+    
     if (secondsLeft >= 0) {
       socket.emit('timer', {secondsLeft: secondsLeft, questionDuration: questionDuration});
       timer();
@@ -190,3 +229,4 @@ function timer() {
     }
   }, 1000)
 }
+
