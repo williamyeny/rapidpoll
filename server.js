@@ -10,6 +10,7 @@ app.set('view engine', 'jade');
 app.set('views', __dirname + "/views");
 app.use(express.static(path.join(__dirname, 'public')));
 //app.use(favicon(path.join(__dirname,'public','favicon.ico')));
+app.enable('trust proxy');
 
 var clients = {};
 var questions = {};
@@ -25,7 +26,7 @@ var maxAnswersPerSecond = 3;
 var muteLength = 60;
 
 app.get('/', function(req, res){
-  res.render('index');
+  res.render('index', {ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress});
 });
 
 socket.on('connection', function(client) {
@@ -33,7 +34,7 @@ socket.on('connection', function(client) {
   client.on('join', function() {
     console.log('User ' + client.id + " connected")
     clients[client.id] = {upvoted: [], ip: client.request.connection.remoteAddress, muted: false};
-    console.log(client);
+    console.log(client); //http://stackoverflow.com/questions/10849687/express-js-how-to-get-remote-client-address
     client.emit('join', {id: client.id, answers: answers, question: currentQuestion});
     socket.emit('clients online', Object.keys(clients).length);
   });
